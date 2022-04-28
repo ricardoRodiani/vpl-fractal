@@ -1,14 +1,21 @@
 package com.br.ufop.vplfractal.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.rmi.ServerException;
 
 @RestController
-@RequestMapping("/api/messages")
+@ResponseBody
+@RequestMapping("/api/")
 public class MessageController {
-    @GetMapping("/hello")
-    public String hello(){
-        return "Teste de Msg";
+    @PostMapping("/fractal")
+    public ResponseEntity<String> postBody(@RequestBody String fractal) throws ServerException {
+        if (fractal == null){
+            throw new ServerException("Expected a body");
+        } else {
+            return new ResponseEntity<>(fractal, HttpStatus.ACCEPTED);
+        }
     }
 }
