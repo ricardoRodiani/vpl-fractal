@@ -18,6 +18,7 @@
             <v-btn dark @click="copyToClipboard">Copy</v-btn>
           </v-card-actions>
           <v-card-text style="white-space: pre">
+            {{ msg }}
             {{ code }}
           </v-card-text>
         </v-card>
@@ -38,6 +39,7 @@ export default {
   },
   data() {
     return {
+      msg: '',
       header: `
               // file: fractal-apps/src/main/scala/br/ufmg/cs/systems/fractal/apps/MyMotifsApp.scala
               package br.ufmg.cs.systems.fractal.apps
@@ -150,6 +152,13 @@ export default {
       navigator.clipboard.writeText(this.code);
     },
   },
+  mounted() {
+    fetch('/api/messages/hello')
+        .then((response) => response.text())
+        .then((data) => {
+          this.msg = data;
+        })
+  }
 };
 </script>
 
