@@ -157,8 +157,7 @@ export default {
       fetch(url,options)
           .then((resp) => resp.json())
           .then(function(data) {
-            let fractal = data.results;
-            return fractal.toString();
+            console.log(data);
           })
           .catch(function(error) {
             console.log(error);
