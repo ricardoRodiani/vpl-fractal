@@ -1,6 +1,6 @@
 <template>
   <div id="app" data-app>
-    <BlocklyComponent id="blockly" :options="options" ref="ref_blk"/>
+    <BlocklyComponent id="blockly" :options="options" ref="ref_blk" />
     <div class="text-center">
       <v-dialog v-model="dialog" width="700px" scrollable>
         <template v-slot:activator="{ on }">
@@ -29,6 +29,8 @@
 <script>
 import BlocklyJS from "blockly/javascript";
 import BlocklyComponent from "./components/BlocklyComponent.vue";
+import DarkTheme from "@blockly/theme-dark";
+import axios from "axios";
 import "./blocks/fractal";
 
 export default {
@@ -38,7 +40,7 @@ export default {
   },
   data() {
     return {
-      msg: '',
+      msg: "",
       header: `
               // file: fractal-apps/src/main/scala/br/ufmg/cs/systems/fractal/apps/MyMotifsApp.scala
               package br.ufmg.cs.systems.fractal.apps
@@ -69,6 +71,7 @@ export default {
       dialog: false,
       dialogFile: false,
       options: {
+        theme: DarkTheme,
         collapse: true,
         comments: false,
         disable: false,
@@ -146,22 +149,52 @@ export default {
       this.code = BlocklyJS.workspaceToCode(this.$refs["ref_blk"].workspace);
       this.code = this.header + this.code;
       this.code = this.code + this.footer;
-      const url = '/api/fractal'
+
       const options = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json;charset=utf-8'
-        },
-        body: JSON.stringify(this.code)
-      }
-      fetch(url,options)
-          .then((resp) => resp.json())
-          .then(function(data) {
-            console.log(data);
-          })
-          .catch(function(error) {
-            console.log(error);
-          })
+        method: "GET",
+        url: "http://localhost:8000/",
+        headers: { "Content-Type": "application/json" },
+        data: {},
+      };
+
+      axios
+        .request(options)
+        .then(function (response) {
+          console.log(response.data);
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
+
+      // fetch("api/cliques/2", {
+      //   method: "GET",
+      //   headers: {
+      //     "Content-Type": "application/json;charset=utf-8",
+      //   },
+      //   body: {
+      //     file: "local:/home/zxc/libs_tcc/fractal/fractal-core/build/libs/fractal-core-SPARK-2.2.0.jar",
+      //     className: "br.ufmg.cs.systems.fractal.FractalSparkRunner",
+      //     args: [
+      //       "al",
+      //       "/home/zxc/libs_tcc/fractal/data/citeseer-single-label.graph",
+      //       "cliques",
+      //       "scratch",
+      //       "1",
+      //       "2",
+      //       "info",
+      //     ],
+      //     driverMemory: "2g",
+      //     numExecutors: 1,
+      //     executorCores: 1,
+      //     executorMemory: "2g",
+      //   },
+      // })
+      //   .then((response) => {
+      //     console.log(response);
+      //   })
+      //   .catch((err) => {
+      //     console.error(err);
+      //   });
     },
     copyToClipboard() {
       navigator.clipboard.writeText(this.code);
