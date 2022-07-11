@@ -1,0 +1,31 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "backend for vpl-fractal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ricardoRodiani/vpl-fractal.git"
+  },
+  "author": "Ricardo Rodiani",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ricardoRodiani/vpl-fractal/issues"
+  },
+  "homepage": "https://github.com/ricardoRodiani/vpl-fractal#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "express": "^4.18.1",
+    "livy-client": "^1.0.1",
+    "mongodb": "^4.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
