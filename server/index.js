@@ -1,6 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
+const fileUpload = require('express-fileupload')
+
 
 
 
@@ -8,11 +10,12 @@ const app = express()
 
 // Middleware
 app.use(bodyParser.json())
+app.use(fileUpload)
 app.use(cors())
 
-const posts = require('./routes/api/posts')
+const fractal = require('./routes/api/fractal')
 
-app.use('/api/posts', posts)
+app.use('/api/fractal', fractal)
 
 const port = process.env.PORT || 5000
 

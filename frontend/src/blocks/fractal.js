@@ -1,6 +1,7 @@
 import * as Blockly from "blockly/core";
 import { FieldSlider } from "@blockly/field-slider";
 import file_path from "./../assets/file_upload.svg";
+import axios from "axios";
 
 let fileContent;
 
@@ -88,10 +89,22 @@ function func() {
         // here we tell the reader what to do when it's done reading...
         reader.onload = (readerEvent) => {
             fileContent = readerEvent.target.result; // this is the content!
+            let formData = new FormData();
+            formData.append("image", fileContent);
+            axios.post('http://localhost:5000/api/posts/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }).then(function (response) {
+                  console.log(response.data);
+                })
+                .catch(function (error) {
+                  console.error(error);
+                });
         };
     };
     input.click();
-    return fileContent;
+    return fileContent
 }
 
 Blockly.Blocks["input"] = {

@@ -149,12 +149,15 @@ export default {
       this.code = BlocklyJS.workspaceToCode(this.$refs["ref_blk"].workspace);
       this.code = this.header + this.code;
       this.code = this.code + this.footer;
-
+      var json = BlocklyJS.serialization.workspaces.save(this.$refs["ref_blk"].workspace);
       const options = {
         method: "GET",
-        url: "http://localhost:8000/",
+        url: "/api/posts/",
         headers: { "Content-Type": "application/json" },
-        data: {},
+        data: {
+          statement: '2 * 3',
+          json
+        },
       };
 
       axios
