@@ -1,6 +1,7 @@
 const express = require('express')
-const mongodb = require('mongodb')
 const LivyClient = require('livy-client')
+
+const router = express.Router();
 
 const start = async (stmt) => {
 
@@ -42,25 +43,56 @@ const start = async (stmt) => {
 
 }
 
+router.post('/', (req, res) => {
+	
+})
 
-const router = express.Router()
 
-// Request handler/endpoint
-router.post("/upload", (req, res) => {
-	if (!req.files) {
-        return res.status(500).send({ msg: "file is not found" })
-    }
-     // accessing the file
-	 const myFile = req.files.file;
-    //  mv() method places the file inside public directory
-    myFile.mv(`${__dirname}/public/${myFile.name}`, function (err) {
-        if (err) {
-            console.log(err)
-            return res.status(500).send({ msg: "Error occured" });
+router.post('/upload', async (req, res) =>  {
+	try {
+        if(!req.files) {
+            res.send({
+                status: false,
+                message: 'No file uploaded'
+            });
+        } else {
+            let file = req.files.file;
+            
+            //Use the mv() method to place the file in upload directory (i.e. "uploads")
+            file.mv('./public/' + file.name);
+
+            //send response
+            res.send({
+                status: true,
+                message: `File "${file.name}" was uploaded`,
+                data: {
+                    name: file.name,
+                    mimetype: file.mimetype,
+                    size: file.size
+                }
+            });
         }
-        // returing the response with file path and name
-        return res.send({name: myFile.name, path: `/${myFile.name}`});
-    });
+    } catch (err) {
+        res.status(500).send(err);
+    }
 });
+
+function validateCookie(req, res, next){
+	const { cookies } = req;
+	if('session_id' in cookies){
+		console.log('Session ID Exists.')
+		if(cookies.session_id === '1234'){
+			next()
+		}else{
+			res.status(403).send({msg: 'Not auth'})
+		}
+	}
+	next()
+}
+
+router.get('/signin', validateCookie, (req, res) => {
+	res.cookie('session_id', '1234')
+	res.status(200).json({msg: 'Logged In.'})
+})
 
 module.exports = router

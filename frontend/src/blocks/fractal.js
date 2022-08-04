@@ -1,7 +1,7 @@
 import * as Blockly from "blockly/core";
 import { FieldSlider } from "@blockly/field-slider";
 import file_path from "./../assets/file_upload.svg";
-import axios from "axios";
+import axios from 'axios'
 
 let fileContent;
 
@@ -77,31 +77,33 @@ Blockly.Blocks["aggregate"] = {
     },
 };
 
+
 function func() {
     let input = document.createElement("input");
     input.type = "file";
     input.onchange = (e) => {
         // getting a hold of the file reference
         let file = e.target.files[0];
+        let formData = new FormData();
+        formData.append("file", file);
+        axios.post('http://localhost:3080/fractal/upload', formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+        })
+        .then(function (response) {
+            console.log(response.data);
+        })
+        .catch(function (error) {
+            console.error(error);
+        });
         // setting up the reader
         let reader = new FileReader();
         reader.readAsText(file, "UTF-8");
         // here we tell the reader what to do when it's done reading...
         reader.onload = (readerEvent) => {
             fileContent = readerEvent.target.result; // this is the content!
-            let formData = new FormData();
-            formData.append("image", fileContent);
-            axios.post('http://localhost:5000/api/posts/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            }).then(function (response) {
-                  console.log(response.data);
-                })
-                .catch(function (error) {
-                  console.error(error);
-                });
-        };
+        }
     };
     input.click();
     return fileContent
@@ -125,6 +127,13 @@ Blockly.Blocks["input"] = {
         this.setColour(60);
         this.setTooltip("Selecione o arquivo de entrada");
         this.setHelpUrl("");
+        this.setOnChange(function() {
+            if (fileContent !== undefined) {
+                this.setWarningText(null);
+            } else {
+              this.setWarningText('Por favor, selecione um arquivo');
+            }
+          });
     },
 };
 

@@ -30,7 +30,7 @@
 import BlocklyJS from "blockly/javascript";
 import BlocklyComponent from "./components/BlocklyComponent.vue";
 import DarkTheme from "@blockly/theme-dark";
-import axios from "axios";
+// import axios from "axios";
 import "./blocks/fractal";
 
 export default {
@@ -68,6 +68,7 @@ export default {
               }
               `,
       code: "",
+      json: null,
       dialog: false,
       dialogFile: false,
       options: {
@@ -146,28 +147,18 @@ export default {
   },
   methods: {
     showCode() {
-      this.code = BlocklyJS.workspaceToCode(this.$refs["ref_blk"].workspace);
+      const workspace = this.$refs["ref_blk"].workspace
+      this.code = BlocklyJS.workspaceToCode(workspace);
       this.code = this.header + this.code;
       this.code = this.code + this.footer;
-      var json = BlocklyJS.serialization.workspaces.save(this.$refs["ref_blk"].workspace);
-      const options = {
-        method: "GET",
-        url: "/api/posts/",
-        headers: { "Content-Type": "application/json" },
-        data: {
-          statement: '2 * 3',
-          json
-        },
-      };
-
-      axios
-        .request(options)
-        .then(function (response) {
-          console.log(response.data);
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
+      // axios
+      //   .post(options)
+      //   .then(function (response) {
+      //     console.log(response.data);
+      //   })
+      //   .catch(function (error) {
+      //     console.error(error);
+      //   });
 
       // fetch("api/cliques/2", {
       //   method: "GET",
