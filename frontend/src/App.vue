@@ -30,7 +30,7 @@
 import BlocklyJS from "blockly/javascript";
 import BlocklyComponent from "./components/BlocklyComponent.vue";
 import DarkTheme from "@blockly/theme-dark";
-// import axios from "axios";
+import axios from "axios";
 import "./blocks/fractal";
 
 export default {
@@ -42,29 +42,17 @@ export default {
     return {
       msg: "",
       header: `
-              // file: fractal-apps/src/main/scala/br/ufmg/cs/systems/fractal/apps/MyMotifsApp.scala
-              package br.ufmg.cs.systems.fractal.apps
-
-              import br.ufmg.cs.systems.fractal._
+              import br.ufmg.cs.systems.fractal._;
               import br.ufmg.cs.systems.fractal.pattern.Pattern
               import br.ufmg.cs.systems.fractal.util.Logging
               import org.apache.hadoop.io.LongWritable
-              import org.apache.spark.{SparkConf, SparkContext}
-
-              object MyFractalApp extends Logging {
-                def main(args: Array[String]): Unit = {
-                  // environment setup
-                  val conf = new SparkConf().setAppName("MotifsApp")
-                  val sc = new SparkContext(conf)
-                  val fc = new FractalContext(sc)
-                  val graphPath = args(0) // input graph
-                  val fgraph = fc.textFile (graphPath)
+              val fc = new FractalContext(sc)
+              val graphPath = "/home/unix/libs_tcc/fractal/data/citeseer-single-label.graph";
+              val fgraph = fc.textFile (graphPath)
                   `,
       footer: `
-              // environment cleaning
-                  fc.stop()
-                  sc.stop()
-                }
+              for ((key,value) <- motifsMap) { 
+                println(s"output{\${'"'}key\${'"'}:\${'"'}\${key}\${'"'},\${'"'}value\${'"'}:\${'"'}\${value}\${'"'}}")
               }
               `,
       code: "",
@@ -108,11 +96,6 @@ export default {
           <field name="NAME">1</field>
         </block>
         <block type="aggregate">
-          <value name="NAME1">
-            <shadow type="text">
-              <field name="TEXT"></field>
-            </shadow>
-          </value>
           <value name="NAME2">
             <shadow type="text">
               <field name="TEXT"></field>
@@ -151,44 +134,16 @@ export default {
       this.code = BlocklyJS.workspaceToCode(workspace);
       this.code = this.header + this.code;
       this.code = this.code + this.footer;
-      // axios
-      //   .post(options)
-      //   .then(function (response) {
-      //     console.log(response.data);
-      //   })
-      //   .catch(function (error) {
-      //     console.error(error);
-      //   });
-
-      // fetch("api/cliques/2", {
-      //   method: "GET",
-      //   headers: {
-      //     "Content-Type": "application/json;charset=utf-8",
-      //   },
-      //   body: {
-      //     file: "local:/home/zxc/libs_tcc/fractal/fractal-core/build/libs/fractal-core-SPARK-2.2.0.jar",
-      //     className: "br.ufmg.cs.systems.fractal.FractalSparkRunner",
-      //     args: [
-      //       "al",
-      //       "/home/zxc/libs_tcc/fractal/data/citeseer-single-label.graph",
-      //       "cliques",
-      //       "scratch",
-      //       "1",
-      //       "2",
-      //       "info",
-      //     ],
-      //     driverMemory: "2g",
-      //     numExecutors: 1,
-      //     executorCores: 1,
-      //     executorMemory: "2g",
-      //   },
-      // })
-      //   .then((response) => {
-      //     console.log(response);
-      //   })
-      //   .catch((err) => {
-      //     console.error(err);
-      //   });
+      axios
+        .post('http://localhost:3080/fractal/runcode', {
+          stmt: `${this.code}`
+        })
+        .then(function (response) {
+          console.log(response.data);
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
     },
     copyToClipboard() {
       navigator.clipboard.writeText(this.code);

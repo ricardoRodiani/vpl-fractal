@@ -9,6 +9,8 @@ let fileContent;
  * Blocks definition
  */
 
+
+
 Blockly.Blocks["expand"] = {
     init: function () {
         this.appendDummyInput()
@@ -43,32 +45,28 @@ Blockly.Blocks["aggregate"] = {
             .setAlign(Blockly.ALIGN_RIGHT)
             .appendField("Argumento 1")
             .appendField(
-                new Blockly.FieldDropdown([["Pattern", "argpattern"]]),
+                new Blockly.FieldDropdown([["Pattern", "Pattern"]]),
                 "arg1"
             );
         this.appendDummyInput()
             .setAlign(Blockly.ALIGN_RIGHT)
             .appendField("Argumento 2")
             .appendField(
-                new Blockly.FieldDropdown([["LongWritable", "arglongwritable"]]),
+                new Blockly.FieldDropdown([["LongWritable", "LongWritable"]]),
                 "arg2"
             );
-        this.appendValueInput("NAME1")
-            .setCheck("String")
-            .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField("Custom name");
         this.appendValueInput("NAME2")
             .setCheck("String")
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField("Key function");
+            .appendField("Key function (e,c,k)");
         this.appendValueInput("NAME3")
             .setCheck("String")
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField("Value function");
+            .appendField("Value function (e,c,v)");
         this.appendValueInput("NAME")
             .setCheck("String")
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField("Reduce function");
+            .appendField("Reduce function (v1,v2)");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(330);
@@ -172,46 +170,38 @@ Blockly.JavaScript["expand"] = function (block) {
     // 	Blockly.JavaScript.ORDER_ATOMIC
     // );
     // TODO: Assemble JavaScript into code letiable.
-    let code = `// motifs application
-				val motifs = fgraph.${tipo}.
+    let code = `val motifs = fgraph.${tipo}.
 				expand(${passos}).
 				`;
     return code;
 };
 
 Blockly.JavaScript["aggregate"] = function (block) {
-    let value_name1 = Blockly.JavaScript.valueToCode(
-        block,
-        "NAME1",
-        Blockly.JavaScript.ORDER_ATOMIC
-    );
     let value_name2 = Blockly.JavaScript.valueToCode(
         block,
         "NAME2",
         Blockly.JavaScript.ORDER_ATOMIC
-    );
+    ).replace(/["']/g, "");
     let value_name3 = Blockly.JavaScript.valueToCode(
         block,
         "NAME3",
         Blockly.JavaScript.ORDER_ATOMIC
-    );
+    ).replace(/["']/g, "");
     let value_name = Blockly.JavaScript.valueToCode(
         block,
         "NAME",
         Blockly.JavaScript.ORDER_ATOMIC
-    );
+    ).replace(/["']/g, "");
+    let arg1 = block.getFieldValue("arg1").replace(/["']/g, "");
+    let arg2 = block.getFieldValue("arg2").replace(/["']/g, "");
     // TODO: Assemble JavaScript into code letiable.
-    let code = `
-				aggregate [Pattern,LongWritable] (
-				${value_name1},
-				(e,c,k) => { ${value_name2} },
-				(e,c,v) => { ${value_name3} },
-				(v1,v2) => { ${value_name} 	})
-
-				val motifsMap = motifs.aggregationMap[Pattern,LongWritable](${value_name1})
-					for ((motif,count) <- motifsMap) {
-					logInfo(s"motif=\${motif} count=\${count}")
-				}
+    let code = `aggregate [${arg1},${arg2}] (
+                    "motifs", 
+                    (e,c,k) => { ${value_name2} },
+                    (e,c,v) => { ${value_name3} },
+                    (v1,v2) => { ${value_name} 	}
+                ).explore(3)
+                val motifsMap = motifs.aggregationMap[${arg1},${arg2}]("motifs"); 
 				`;
     // TODO: Change ORDER_NONE to the correct strength.
     // return [code, Blockly.JavaScript.ORDER_NONE];
