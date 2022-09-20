@@ -5,6 +5,9 @@ import axios from 'axios'
 
 let fileContent;
 
+// let expand_qtd = 0;
+// let agg_qtd = 0;
+
 /**
  * Blocks definition
  */
@@ -19,7 +22,7 @@ Blockly.Blocks["expand"] = {
         this.appendDummyInput().appendField(
             new Blockly.FieldDropdown([
                 ["Expansão por Vértice", "vfractoid"],
-                ["Expansão por Aresta", "afractoid"],
+                ["Expansão por Aresta", "efractoid"],
                 ["Expansão por Padrão", "pfractoid"],
             ]),
             "DROPDOWN"
@@ -152,7 +155,7 @@ Blockly.Blocks["filter"] = {
         this.appendValueInput("OPTION1")
             .setCheck("String")
             .setAlign(Blockly.ALIGN_RIGHT)
-            .appendField("Function");
+            .appendField("Function (e,c) ");
         this.setPreviousStatement(true, null);
         this.setNextStatement(true, null);
         this.setColour(230);
@@ -162,17 +165,17 @@ Blockly.Blocks["filter"] = {
 };
 
 Blockly.JavaScript["expand"] = function (block) {
-    let tipo = block.getFieldValue("DROPDOWN");
+    // let tipo = block.getFieldValue("DROPDOWN");
     let passos = block.getFieldValue("NAME");
+    let choice = block.getFieldValue("DROPDOWN")
     // let value_name = Blockly.JavaScript.valueToCode(
     // 	block,
     // 	"NAME",
     // 	Blockly.JavaScript.ORDER_ATOMIC
     // );
     // TODO: Assemble JavaScript into code letiable.
-    let code = `val motifs = fgraph.${tipo}.
-				expand(${passos}).
-				`;
+    let code = `.${choice}.expand(${passos}).
+				`;    
     return code;
 };
 
@@ -200,8 +203,8 @@ Blockly.JavaScript["aggregate"] = function (block) {
                     (e,c,k) => { ${value_name2} },
                     (e,c,v) => { ${value_name3} },
                     (v1,v2) => { ${value_name} 	}
-                ).explore(3)
-                val motifsMap = motifs.aggregationMap[${arg1},${arg2}]("motifs"); 
+                )
+                val motifsMap = motifs.aggregationMap[${arg1},${arg2}]("motifs") 
 				`;
     // TODO: Change ORDER_NONE to the correct strength.
     // return [code, Blockly.JavaScript.ORDER_NONE];
@@ -213,14 +216,9 @@ Blockly.JavaScript["filter"] = function (block) {
         block,
         "OPTION1",
         Blockly.JavaScript.ORDER_ATOMIC
-    );
-    let value_option2 = Blockly.JavaScript.valueToCode(
-        block,
-        "OPTION2",
-        Blockly.JavaScript.ORDER_ATOMIC
-    );
+    ).replace(/["']/g, "");
     // TODO: Assemble JavaScript into code letiable.
-    let code = `\n${{ value_option1, value_option2 }}`;
+    let code = `filter { (e,c) => ${value_option1} }.`;
     // TODO: Change ORDER_NONE to the correct strength.
     // return [code, Blockly.JavaScript.ORDER_NONE];
     return code;

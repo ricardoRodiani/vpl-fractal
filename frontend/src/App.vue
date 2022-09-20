@@ -49,11 +49,12 @@ export default {
               val fc = new FractalContext(sc)
               val graphPath = "/home/unix/libs_tcc/fractal/data/citeseer-single-label.graph";
               val fgraph = fc.textFile (graphPath)
-                  `,
+              val motifs = fgraph`,
       footer: `
               for ((key,value) <- motifsMap) { 
                 println(s"output{\${'"'}key\${'"'}:\${'"'}\${key}\${'"'},\${'"'}value\${'"'}:\${'"'}\${value}\${'"'}}")
               }
+              fc.stop()
               `,
       code: "",
       json: null,
@@ -132,6 +133,9 @@ export default {
     showCode() {
       const workspace = this.$refs["ref_blk"].workspace
       this.code = BlocklyJS.workspaceToCode(workspace);
+      let match = this.code.match('.*fractoid.')
+      this.code = this.code.replaceAll(match[0], '')
+      this.header  = this.header  + match[0]
       this.code = this.header + this.code;
       this.code = this.code + this.footer;
       axios
