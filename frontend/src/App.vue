@@ -1,6 +1,7 @@
 <template>
   <div id="app" data-app>
     <BlocklyComponent id="blockly" :options="options" ref="ref_blk" />
+
     <div class="text-center">
       <v-dialog v-model="dialog" width="700px" scrollable>
         <template v-slot:activator="{ on }">
@@ -18,7 +19,8 @@
             <v-btn dark @click="copyToClipboard">Copy</v-btn>
           </v-card-actions>
           <v-card-text style="white-space: pre">
-            {{ code }}
+            <!-- {{ code }} -->
+            <GraphComponentVue/>
           </v-card-text>
         </v-card>
       </v-dialog>
@@ -29,6 +31,7 @@
 <script>
 import BlocklyJS from "blockly/javascript";
 import BlocklyComponent from "./components/BlocklyComponent.vue";
+import GraphComponentVue from "./components/GraphComponent.vue";
 import DarkTheme from "@blockly/theme-dark";
 import axios from "axios";
 import "./blocks/fractal";
@@ -37,6 +40,7 @@ export default {
   name: "app",
   components: {
     BlocklyComponent,
+    GraphComponentVue
   },
   data() {
     return {
@@ -131,16 +135,16 @@ export default {
   },
   methods: {
     showCode() {
-      const workspace = this.$refs["ref_blk"].workspace
+      const workspace = this.$refs["ref_blk"].workspace;
       this.code = BlocklyJS.workspaceToCode(workspace);
-      let match = this.code.match('.*fractoid.')
-      this.code = this.code.replaceAll(match[0], '')
-      this.header  = this.header  + match[0]
+      let match = this.code.match(".*fractoid.");
+      this.code = this.code.replace(/.*fractoid./g, "");
+      this.header = this.header + match[0];
       this.code = this.header + this.code;
       this.code = this.code + this.footer;
       axios
-        .post('http://localhost:3080/fractal/runcode', {
-          stmt: `${this.code}`
+        .post("http://localhost:3080/fractal/runcode", {
+          stmt: `${this.code}`,
         })
         .then(function (response) {
           console.log(response.data);
@@ -152,7 +156,7 @@ export default {
     copyToClipboard() {
       navigator.clipboard.writeText(this.code);
     },
-  },
+  }
 };
 </script>
 
