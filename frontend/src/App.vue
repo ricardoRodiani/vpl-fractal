@@ -3,7 +3,7 @@
     <BlocklyComponent id="blockly" :options="options" ref="ref_blk" />
 
     <div class="text-center">
-      <v-dialog v-model="dialog" width="700px" scrollable>
+      <v-dialog v-model="dialog" width="800px" scrollable>
         <template v-slot:activator="{ on }">
           <v-btn absolute right top @click="showCode" dark v-on="on">
             <span> Show Code</span>
@@ -18,10 +18,10 @@
             <v-spacer></v-spacer>
             <v-btn dark @click="copyToClipboard">Copy</v-btn>
           </v-card-actions>
-          <v-card-text style="white-space: pre">
-            <!-- {{ code }} -->
-            <GraphComponentVue/>
-          </v-card-text>
+          <!-- <v-card-text style="white-space: pre"> -->
+          <!-- {{ code }} -->
+          <GraphComponentVue />
+          <!-- </v-card-text> -->
         </v-card>
       </v-dialog>
     </div>
@@ -40,7 +40,7 @@ export default {
   name: "app",
   components: {
     BlocklyComponent,
-    GraphComponentVue
+    GraphComponentVue,
   },
   data() {
     return {
@@ -156,7 +156,7 @@ export default {
     copyToClipboard() {
       navigator.clipboard.writeText(this.code);
     },
-  }
+  },
 };
 </script>
 
