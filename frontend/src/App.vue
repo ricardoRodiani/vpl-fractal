@@ -1,16 +1,15 @@
 <template>
   <div id="app" data-app>
     <BlocklyComponent id="blockly" :options="options" ref="ref_blk" />
-
-    <div class="text-center">
-      <v-dialog v-model="dialog" width="800px" scrollable>
+    <v-layout class="fab-container">
+      <v-dialog v-model="code_dialog" width="800px" scrollable>
         <template v-slot:activator="{ on }">
-          <v-btn absolute right top @click="showCode" dark v-on="on">
+          <v-btn @click="showCode" dark v-on="on" class="menu-btn">
             <span> Show Code</span>
             <v-icon small right>mdi-eye</v-icon>
           </v-btn>
         </template>
-        <v-card>
+        <v-card v-if="showCode">
           <v-card-actions>
             <v-card-title class="headline grey lighten-2" primary-title>
               Fractal Code
@@ -18,13 +17,33 @@
             <v-spacer></v-spacer>
             <v-btn dark @click="copyToClipboard">Copy</v-btn>
           </v-card-actions>
-          <!-- <v-card-text style="white-space: pre"> -->
-          <!-- {{ code }} -->
-          <GraphComponentVue />
-          <!-- </v-card-text> -->
+          <v-card-text style="white-space: pre">
+            {{ code }}
+          </v-card-text>
         </v-card>
       </v-dialog>
-    </div>
+      <v-dialog v-model="graph_dialog" width="800px" scrollable>
+        <template v-slot:activator="{ on }">
+          <v-btn @click="showCode" dark v-on="on" class="menu-btn">
+            <span> Show Result</span>
+            <v-icon small right>mdi-eye</v-icon>
+          </v-btn>
+        </template>
+        <v-card>
+          <v-card-actions>
+            <v-card-title class="headline grey lighten-2" primary-title>
+              Graph Visualization
+            </v-card-title>
+            <v-spacer></v-spacer>
+            <!-- <v-btn dark @click="exportSvg">Export SVG</v-btn> -->
+          </v-card-actions>
+          <GraphComponentVue
+            v-bind:network_prop="network"
+            v-bind:networkEvents_prop="networkEvents"
+          />
+        </v-card>
+      </v-dialog>
+    </v-layout>
   </div>
 </template>
 
@@ -44,6 +63,50 @@ export default {
   },
   data() {
     return {
+      networkEvents: "",
+      network: {
+        nodes: [
+          { id: 1, label: "Node 1" },
+          { id: 2, label: "Node 2" },
+          { id: 3, label: "Node 3" },
+          { id: 4, label: "Node 4" },
+          { id: 5, label: "Node 5" },
+        ],
+        edges: [
+          { id: 1, from: 1, to: 3 },
+          { id: 2, from: 1, to: 2 },
+          { id: 3, from: 2, to: 4 },
+          { id: 4, from: 2, to: 5 },
+          { id: 5, from: 3, to: 3 },
+        ],
+        options: {
+          height: "640px",
+          physics: true,
+          nodes: {
+            widthConstraint: 60,
+            heightConstraint: 20,
+
+            borderWidth: 1,
+            borderWidthSelected: 2,
+            shape: "circle",
+
+            color: {
+              selected: "orange",
+              background: "lightgray",
+              border: "black",
+            },
+            font: {
+              color: "black",
+              size: 14,
+              // face: "Poppins",
+              background: "",
+              strokeWidth: 0,
+              strokeColor: "#ffffff",
+            },
+            shadow: false,
+          },
+        },
+      },
       msg: "",
       header: `
               import br.ufmg.cs.systems.fractal._;
@@ -62,8 +125,8 @@ export default {
               `,
       code: "",
       json: null,
-      dialog: false,
-      dialogFile: false,
+      code_dialog: false,
+      graph_dialog: false,
       options: {
         theme: DarkTheme,
         collapse: true,
@@ -156,6 +219,14 @@ export default {
     copyToClipboard() {
       navigator.clipboard.writeText(this.code);
     },
+    exportSvg() {
+      const old_label = this.network.nodes["1"].label;
+      if (old_label == "Teste") {
+        this.network.nodes["1"].label = "Teste 2";
+      } else {
+        this.network.nodes["1"].label = "Teste";
+      }
+    },
   },
 };
 </script>
@@ -179,6 +250,16 @@ body {
   bottom: 0;
   width: 100%;
   height: 100%;
+}
+
+.fab-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+}
+
+.menu-btn {
+  margin: 10px;
 }
 </style>
 

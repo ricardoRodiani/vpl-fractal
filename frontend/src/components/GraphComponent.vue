@@ -54,52 +54,17 @@
 <script>
 import { Network } from "vue2vis";
 export default {
-  data: () => ({
-    networkEvents: "",
-    network: {
-      nodes: [
-        { id: 1, label: "Node 1" },
-        { id: 2, label: "Node 2" },
-        { id: 3, label: "Node 3" },
-        { id: 4, label: "Node 4" },
-        { id: 5, label: "Node 5" },
-      ],
-      edges: [
-        { id: 1, from: 1, to: 3 },
-        { id: 2, from: 1, to: 2 },
-        { id: 3, from: 2, to: 4 },
-        { id: 4, from: 2, to: 5 },
-        { id: 5, from: 3, to: 3 },
-      ],
-      options: {
-        height: "500px",
-        physics: false,
-        nodes: {
-          widthConstraint: 60,
-          heightConstraint: 20,
-
-          borderWidth: 1,
-          borderWidthSelected: 2,
-          shape: "box",
-
-          color: {
-            selected: "orange",
-            background: "lightgray",
-            border: "black",
-          },
-          font: {
-            color: "black",
-            size: 10,
-            face: "Poppins",
-            background: "",
-            strokeWidth: 0,
-            strokeColor: "#ffffff",
-          },
-          shadow: false,
-        },
-      },
-    },
-  }),
+  props: ["networkEvents_prop", "network_prop"],
+  data() {
+    return {
+      network: null,
+      networkEvents: null,
+    };
+  },
+  mounted() {
+    this.network = this.$props.network_prop || {};
+    this.networkEvents = this.$props.networkEvents_prop || {};
+  },
   components: {
     Network,
   },
@@ -134,15 +99,15 @@ export default {
       ctx.strokeStyle = "green";
       ctx.fillStyle = "green";
 
-      this.network.nodes.map(
-        function (node) {
-          let n = this.$refs.network.getPositions(node.id)[node.id];
-          ctx.strokeRect(n.x - 50, n.y - 50, 100, 100);
-          ctx.fillText("Hello Homie", n.x, n.y - 40);
-          return null;
-        }.bind(this)
-      );
-      // ctx.strokeRect(50, 50, 100, 100);
+      // this.network.nodes.map(
+      //   function (node) {
+      //     let n = this.$refs.network.getPositions(node.id)[node.id];
+      //     ctx.strokeRect(n.x - 50, n.y - 50, 100, 100);
+      //     ctx.fillText("Hello Homie", n.x, n.y - 40);
+      //     return null;
+      //   }.bind(this)
+      // );
+      // // ctx.strokeRect(50, 50, 100, 100);
       ctx.stroke();
     },
 
@@ -181,6 +146,7 @@ export default {
   padding: 10px 10px;
   text-align: center;
   height: 800px;
+  width: 800px;
 }
 .events {
   text-align: left;
