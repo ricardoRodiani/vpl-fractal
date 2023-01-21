@@ -54,17 +54,15 @@
 <script>
 import { Network } from "vue2vis";
 export default {
-  props: ["networkEvents_prop", "network_prop"],
+  props: ["networkEvents_prop", "network_prop", "unique_motif_value"],
   data() {
     return {
-      network: null,
-      networkEvents: null,
+      network: this.$props.network_prop || {},
+      networkEvents: this.$props.networkEvents_prop || {},
+      uniqueMotifValue: this.$props.unique_motif_value || {},
     };
   },
-  mounted() {
-    this.network = this.$props.network_prop || {};
-    this.networkEvents = this.$props.networkEvents_prop || {};
-  },
+  mounted() {},
   components: {
     Network,
   },
@@ -98,16 +96,24 @@ export default {
     afterDrawing(ctx) {
       ctx.strokeStyle = "green";
       ctx.fillStyle = "green";
-
-      // this.network.nodes.map(
-      //   function (node) {
-      //     let n = this.$refs.network.getPositions(node.id)[node.id];
-      //     ctx.strokeRect(n.x - 50, n.y - 50, 100, 100);
-      //     ctx.fillText("Hello Homie", n.x, n.y - 40);
-      //     return null;
-      //   }.bind(this)
-      // );
-      // // ctx.strokeRect(50, 50, 100, 100);
+      let groups = Object.keys(this.network.options.groups);
+      const motifValue = this.uniqueMotifValue;
+      this.network.nodes.map(
+        function (node) {
+          if (groups.includes(node.group)) {
+            let n = this.$refs.network.getPositions(node.id)[node.id];
+            // ctx.strokeRect(n.x - 50, n.y - 50, 100, 100);
+            ctx.fillText(
+              `${node.group} [${motifValue[node.group]}]`,
+              n.x + 30,
+              n.y - 40
+            );
+            groups = groups.filter((item) => item !== node.group);
+            return null;
+          }
+        }.bind(this)
+      );
+      // ctx.strokeRect(50, 50, 100, 100);
       ctx.stroke();
     },
 

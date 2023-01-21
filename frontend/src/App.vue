@@ -24,7 +24,7 @@
       </v-dialog>
       <v-dialog v-model="graph_dialog" width="800px" scrollable>
         <template v-slot:activator="{ on }">
-          <v-btn @click="showCode" dark v-on="on" class="menu-btn">
+          <v-btn @click="showGraph" dark v-on="on" class="menu-btn">
             <span> Show Result</span>
             <v-icon small right>mdi-eye</v-icon>
           </v-btn>
@@ -40,6 +40,7 @@
           <GraphComponentVue
             v-bind:network_prop="network"
             v-bind:networkEvents_prop="networkEvents"
+            v-bind:unique_motif_value="uniqueMotifValue"
           />
         </v-card>
       </v-dialog>
@@ -63,23 +64,14 @@ export default {
   },
   data() {
     return {
+      uniqueMotifValue: {},
       networkEvents: "",
       network: {
-        nodes: [
-          { id: 1, label: "Node 1" },
-          { id: 2, label: "Node 2" },
-          { id: 3, label: "Node 3" },
-          { id: 4, label: "Node 4" },
-          { id: 5, label: "Node 5" },
-        ],
-        edges: [
-          { id: 1, from: 1, to: 3 },
-          { id: 2, from: 1, to: 2 },
-          { id: 3, from: 2, to: 4 },
-          { id: 4, from: 2, to: 5 },
-          { id: 5, from: 3, to: 3 },
-        ],
+        nodes: [],
+        edges: [],
         options: {
+          autoResize: true,
+          groups: {},
           height: "640px",
           physics: true,
           nodes: {
@@ -91,7 +83,7 @@ export default {
             shape: "circle",
 
             color: {
-              selected: "orange",
+              // selected: "orange",
               background: "lightgray",
               border: "black",
             },
@@ -125,6 +117,7 @@ export default {
               `,
       code: "",
       json: null,
+      outputObjects: [],
       code_dialog: false,
       graph_dialog: false,
       options: {
@@ -198,21 +191,31 @@ export default {
   },
   methods: {
     showCode() {
+      this.outputObjects = [];
       const workspace = this.$refs["ref_blk"].workspace;
       this.code = BlocklyJS.workspaceToCode(workspace);
       let match = this.code.match(".*fractoid.");
       this.code = this.code.replace(/.*fractoid./g, "");
-      this.header = this.header + match[0];
-      this.code = this.header + this.code;
+      let temp_header = this.header + match[0];
+      this.code = temp_header + this.code;
       this.code = this.code + this.footer;
+
       axios
         .post("http://localhost:3080/fractal/runcode", {
           stmt: `${this.code}`,
         })
-        .then(function (response) {
+        .then((response) => {
           console.log(response.data);
+          let outputString =
+            response.data.data["text/plain"].match(/output{.*}/g);
+
+          outputString.map((string) => {
+            const obj = JSON.parse(string.split(/output/g)[1]);
+            this.outputObjects.push(obj);
+          });
+          console.log(this.outputObjects);
         })
-        .catch(function (error) {
+        .catch((error) => {
           console.error(error);
         });
     },
@@ -220,12 +223,97 @@ export default {
       navigator.clipboard.writeText(this.code);
     },
     exportSvg() {
-      const old_label = this.network.nodes["1"].label;
+      let old_label = this.network.nodes["1"].label;
       if (old_label == "Teste") {
         this.network.nodes["1"].label = "Teste 2";
       } else {
         this.network.nodes["1"].label = "Teste";
       }
+    },
+    showGraph() {
+      this.network.nodes = [];
+      this.network.edges = [];
+      const nodesUniqueId = [];
+      let uniqueGroups = [];
+      let uniqueGroupsObj = {};
+      let uniqueMotifValue = {};
+      let edgesCount = 0;
+      for (let i = 0; i < this.outputObjects.length; i++) {
+        const outputElement = this.outputObjects[i];
+        const aNodes = outputElement.key.split("],");
+        const nValue = outputElement.value;
+        let diff_index = 0;
+        for (let j = 0; j < aNodes.length; j++) {
+          const nodeElement = aNodes[j];
+          const sMotif = nodeElement.slice(1, 8);
+          const aNodeLabel = sMotif.split("-");
+          let fromNodeId = aNodeLabel[0].slice(0, 1);
+          const fromNodeLabel = aNodeLabel[0].slice(2, 3);
+          let toNodeId = aNodeLabel[1].slice(0, 1);
+          const toNodeLabel = aNodeLabel[1].slice(2, 3);
+          const groupName = `Motif ${i}`;
+          let addFromNode = false;
+          let addToNode = false;
+          if (nodesUniqueId.indexOf(fromNodeId) === -1) {
+            nodesUniqueId.push(fromNodeId);
+            addFromNode = true;
+          }
+          if (nodesUniqueId.indexOf(toNodeId) === -1) {
+            nodesUniqueId.push(toNodeId);
+            addToNode = true;
+          }
+          if (uniqueGroups.indexOf(groupName) === -1) {
+            uniqueGroups.push(groupName);
+            uniqueMotifValue[groupName] = nValue;
+          }
+          if (i !== 0 && j == 0) {
+            diff_index = i * 100;
+          }
+          fromNodeId = `${diff_index + parseInt(fromNodeId)}`;
+          toNodeId = `${diff_index + parseInt(toNodeId)}`;
+          if (nodesUniqueId.indexOf(fromNodeId) === -1) {
+            nodesUniqueId.push(fromNodeId);
+            addFromNode = true;
+          }
+          if (nodesUniqueId.indexOf(toNodeId) === -1) {
+            nodesUniqueId.push(toNodeId);
+            addToNode = true;
+          }
+          if (addFromNode) {
+            this.network.nodes.push({
+              id: fromNodeId,
+              group: groupName,
+              label: `${fromNodeLabel}`,
+            });
+          }
+          if (addToNode) {
+            this.network.nodes.push({
+              id: toNodeId,
+              group: groupName,
+              label: `${toNodeLabel}`,
+            });
+          }
+          this.network.edges.push({
+            id: edgesCount,
+            from: fromNodeId,
+            to: toNodeId,
+          });
+          edgesCount++;
+        }
+      }
+
+      // add groups options
+      const colorOptions = ["green", "red", "blue", "orange"];
+      uniqueGroups.map((group, index) => {
+        uniqueGroupsObj[group] = {
+          color: {
+            background: colorOptions[index],
+          },
+          borderWidth: 3,
+        };
+      }, this);
+      this.network.options.groups = uniqueGroupsObj;
+      this.uniqueMotifValue = uniqueMotifValue;
     },
   },
 };
