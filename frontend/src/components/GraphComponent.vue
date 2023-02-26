@@ -53,6 +53,7 @@
 
 <script>
 import { Network } from "vue2vis";
+
 export default {
   props: ["networkEvents_prop", "network_prop", "unique_motif_value"],
   data() {
@@ -94,8 +95,8 @@ export default {
     },
 
     afterDrawing(ctx) {
-      ctx.strokeStyle = "green";
-      ctx.fillStyle = "green";
+      ctx.strokeStyle = "black";
+      ctx.fillStyle = "black";
       let groups = Object.keys(this.network.options.groups);
       const motifValue = this.uniqueMotifValue;
       this.network.nodes.map(

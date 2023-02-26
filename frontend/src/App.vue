@@ -106,9 +106,9 @@ export default {
               import br.ufmg.cs.systems.fractal.util.Logging
               import org.apache.hadoop.io.LongWritable
               val fc = new FractalContext(sc)
-              val graphPath = "/home/unix/libs_tcc/fractal/data/citeseer-single-label.graph";
+              val graphPath = "REPLACE_PATH";
               val fgraph = fc.textFile (graphPath)
-              val motifs = fgraph`,
+              val motifs = fgraph.vfractoid.`,
       footer: `
               for ((key,value) <- motifsMap) { 
                 println(s"output{\${'"'}key\${'"'}:\${'"'}\${key}\${'"'},\${'"'}value\${'"'}:\${'"'}\${value}\${'"'}}")
@@ -157,29 +157,24 @@ export default {
           <field name="NAME">1</field>
         </block>
         <block type="aggregate">
-          <value name="NAME2">
+          <value name="KEY_FN">
             <shadow type="text">
               <field name="TEXT"></field>
             </shadow>
           </value>
-          <value name="NAME3">
+          <value name="VALUE_FN">
             <shadow type="text">
               <field name="TEXT"></field>
             </shadow>
           </value>
-          <value name="NAME">
+          <value name="REDUCE_FN">
             <shadow type="text">
               <field name="TEXT"></field>
             </shadow>
           </value>
         </block>
         <block type="filter">
-          <value name="OPTION1">
-            <shadow type="text">
-              <field name="TEXT"></field>
-            </shadow>
-          </value>
-          <value name="OPTION2">
+          <value name="FUNCTION">
             <shadow type="text">
               <field name="TEXT"></field>
             </shadow>
@@ -194,10 +189,10 @@ export default {
       this.outputObjects = [];
       const workspace = this.$refs["ref_blk"].workspace;
       this.code = BlocklyJS.workspaceToCode(workspace);
-      let match = this.code.match(".*fractoid.");
-      this.code = this.code.replace(/.*fractoid./g, "");
-      let temp_header = this.header + match[0];
-      this.code = temp_header + this.code;
+      // let match = this.code.match(".*fractoid.");
+      // this.code = this.code.replace(/.*fractoid./g, "");
+      // let temp_header = this.header + match[0];
+      this.code = this.header + this.code;
       this.code = this.code + this.footer;
 
       axios
@@ -284,6 +279,12 @@ export default {
               id: fromNodeId,
               group: groupName,
               label: `${fromNodeLabel}`,
+              color: {
+                background: selectColor(fromNodeLabel),
+                border: "black",
+                highlight: { background: "yellow", border: "black" },
+                hover: { background: "yellow", border: "black" },
+              },
             });
           }
           if (addToNode) {
@@ -291,6 +292,12 @@ export default {
               id: toNodeId,
               group: groupName,
               label: `${toNodeLabel}`,
+              color: {
+                background: selectColor(toNodeLabel),
+                border: "black",
+                highlight: { background: "yellow", border: "black" },
+                hover: { background: "yellow", border: "black" },
+              },
             });
           }
           this.network.edges.push({
@@ -303,13 +310,13 @@ export default {
       }
 
       // add groups options
-      const colorOptions = ["green", "red", "blue", "orange"];
-      uniqueGroups.map((group, index) => {
+      // const colorOptions = ["green", "red", "blue", "orange"];
+      uniqueGroups.map((group) => {
         uniqueGroupsObj[group] = {
-          color: {
-            background: colorOptions[index],
-          },
-          borderWidth: 3,
+          // color: {
+          //   background: colorOptions[index],
+          // },
+          // borderWidth: 3,
         };
       }, this);
       this.network.options.groups = uniqueGroupsObj;
@@ -317,6 +324,11 @@ export default {
     },
   },
 };
+
+function selectColor(number) {
+  const hue = number * 137.508; // use golden angle approximation
+  return `hsl(${hue},50%,75%)`;
+}
 </script>
 
 <style>

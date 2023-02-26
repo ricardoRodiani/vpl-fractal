@@ -1,7 +1,9 @@
 const express = require("express");
 const LivyClient = require("livy-client");
-
 const router = express.Router();
+const path = require("path");
+
+let pathFileUploaded;
 
 router.post("/runcode", async (req, res) => {
   start(req, res);
@@ -30,6 +32,7 @@ router.post("/upload", async (req, res) => {
           size: file.size,
         },
       });
+      pathFileUploaded = "/" + file.name;
     }
   } catch (err) {
     res.status(500).send(err);
@@ -37,7 +40,12 @@ router.post("/upload", async (req, res) => {
 });
 
 const start = async (req, res) => {
-  const stmt = req.body.stmt;
+  let relativePath = "./public";
+  let absolutePath = path.resolve(relativePath);
+  const stmt = req.body.stmt.replace(
+    "REPLACE_PATH",
+    absolutePath + pathFileUploaded
+  );
   // Create client
   const livy = new LivyClient({
     host: "localhost",
