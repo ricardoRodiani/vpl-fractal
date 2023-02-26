@@ -246,7 +246,7 @@ export default {
           const fromNodeLabel = aNodeLabel[0].slice(2, 3);
           let toNodeId = aNodeLabel[1].slice(0, 1);
           const toNodeLabel = aNodeLabel[1].slice(2, 3);
-          const groupName = `Motif ${i}`;
+          const groupName = `Motif_${i}`;
           let addFromNode = false;
           let addToNode = false;
           if (nodesUniqueId.indexOf(fromNodeId) === -1) {
