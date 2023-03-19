@@ -105,7 +105,7 @@ export default {
             let n = this.$refs.network.getPositions(node.id)[node.id];
             // ctx.strokeRect(n.x - 50, n.y - 50, 100, 100);
             ctx.fillText(
-              `${node.group} [${motifValue[node.group]}]`,
+              `${node.group} [${parseInt(motifValue[node.group])}]`,
               n.x + 30,
               n.y - 40
             );

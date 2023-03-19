@@ -30,6 +30,41 @@ Blockly.Blocks["expand"] = {
   },
 };
 
+Blockly.Blocks["multiline_arg"] = {
+  init: function () {
+    this.appendDummyInput().appendField(
+      new Blockly.FieldMultilineInput(""),
+      "MULT_ARG"
+    );
+
+    this.setOutput(true, null);
+    this.setColour(160);
+  },
+};
+
+Blockly.JavaScript["multiline_arg"] = function (block) {
+  let code = block.getFieldValue("MULT_ARG");
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
+
+Blockly.Blocks["multiline_append"] = {
+  init: function () {
+    this.appendDummyInput()
+      .appendField("Free code")
+      .appendField(new Blockly.FieldMultilineInput(""), "MULT_APND")
+      .setCheck("String");
+
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(275);
+  },
+};
+
+Blockly.JavaScript["multiline_append"] = function (block) {
+  let code = block.getFieldValue("MULT_APND");
+  return code;
+};
+
 Blockly.Blocks["aggregate"] = {
   init: function () {
     this.appendDummyInput()
@@ -197,6 +232,12 @@ Blockly.JavaScript["filter"] = function (block) {
     "FUNCTION",
     Blockly.JavaScript.ORDER_ATOMIC
   ).replace(/["']/g, "");
-  let code = `filter { (e,c) => ${value_option1} }.`;
+  let arg;
+  if (value_option1.includes("s.")) {
+    arg = "s";
+  } else {
+    arg = "e";
+  }
+  let code = `filter { (${arg},c) => ${value_option1} }.`;
   return code;
 };

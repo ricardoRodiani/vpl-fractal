@@ -64,6 +64,7 @@ export default {
   },
   data() {
     return {
+      execNum: 0,
       uniqueMotifValue: {},
       networkEvents: "",
       network: {
@@ -113,7 +114,6 @@ export default {
               for ((key,value) <- motifsMap) { 
                 println(s"output{\${'"'}key\${'"'}:\${'"'}\${key}\${'"'},\${'"'}value\${'"'}:\${'"'}\${value}\${'"'}}")
               }
-              fc.stop()
               `,
       code: "",
       json: null,
@@ -154,29 +154,29 @@ export default {
         <block type="input"/>
         <block type="expand">
           <field name="DROPDOWN">vfractoid</field>
-          <field name="NAME">1</field>
+          <field name="SLIDER">1</field>
         </block>
         <block type="aggregate">
           <value name="KEY_FN">
-            <shadow type="text">
-              <field name="TEXT"></field>
+            <shadow type="multiline_arg">
+              <field name="MULT_ARG"></field>
             </shadow>
           </value>
           <value name="VALUE_FN">
-            <shadow type="text">
-              <field name="TEXT"></field>
+            <shadow type="multiline_arg">
+              <field name="MULT_ARG"></field>
             </shadow>
           </value>
           <value name="REDUCE_FN">
-            <shadow type="text">
-              <field name="TEXT"></field>
+            <shadow type="multiline_arg">
+              <field name="MULT_ARG"></field>
             </shadow>
           </value>
         </block>
         <block type="filter">
           <value name="FUNCTION">
-            <shadow type="text">
-              <field name="TEXT"></field>
+            <shadow type="multiline_arg">
+              <field name="MULT_ARG"></field>
             </shadow>
           </value>
         </block>
@@ -186,14 +186,19 @@ export default {
   },
   methods: {
     showCode() {
+      const t0 = new Date();
       this.outputObjects = [];
       const workspace = this.$refs["ref_blk"].workspace;
       this.code = BlocklyJS.workspaceToCode(workspace);
       // let match = this.code.match(".*fractoid.");
       // this.code = this.code.replace(/.*fractoid./g, "");
       // let temp_header = this.header + match[0];
+      // if (this.execNum === 0) {
       this.code = this.header + this.code;
       this.code = this.code + this.footer;
+      // } else {
+      //   this.code = `val motifs = fgraph.vfractoid.` + this.code + this.footer;
+      // }
 
       axios
         .post("http://localhost:3080/fractal/runcode", {
@@ -208,11 +213,26 @@ export default {
             const obj = JSON.parse(string.split(/output/g)[1]);
             this.outputObjects.push(obj);
           });
-          console.log(this.outputObjects);
+          // console.log(this.outputObjects);
+          const t1 = new Date();
+          console.log(
+            this.execNum +
+              "tempo exec" +
+              Math.abs((t0.getTime() - t1.getTime()) / 1000)
+          );
         })
         .catch((error) => {
+          this.execNum = 0;
           console.error(error);
+          const t1 = new Date();
+          console.log(
+            this.execNum +
+              "tempo exec " +
+              Math.abs((t0.getTime() - t1.getTime()) / 1000)
+          );
         });
+
+      this.execNum++;
     },
     copyToClipboard() {
       navigator.clipboard.writeText(this.code);
