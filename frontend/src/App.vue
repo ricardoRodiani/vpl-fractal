@@ -193,13 +193,12 @@ export default {
       // let match = this.code.match(".*fractoid.");
       // this.code = this.code.replace(/.*fractoid./g, "");
       // let temp_header = this.header + match[0];
-      // if (this.execNum === 0) {
-      this.code = this.header + this.code;
-      this.code = this.code + this.footer;
-      // } else {
-      //   this.code = `val motifs = fgraph.vfractoid.` + this.code + this.footer;
-      // }
-
+      if (this.execNum % 10 === 0) {
+        this.code = this.header + this.code;
+        this.code = this.code + this.footer;
+      } else {
+        this.code = `val motifs = fgraph.vfractoid.` + this.code + this.footer;
+      }
       axios
         .post("http://localhost:3080/fractal/runcode", {
           stmt: `${this.code}`,
@@ -217,7 +216,7 @@ export default {
           const t1 = new Date();
           console.log(
             this.execNum +
-              "tempo exec" +
+              " tempo exec" +
               Math.abs((t0.getTime() - t1.getTime()) / 1000)
           );
         })
@@ -227,7 +226,7 @@ export default {
           const t1 = new Date();
           console.log(
             this.execNum +
-              "tempo exec " +
+              " tempo exec " +
               Math.abs((t0.getTime() - t1.getTime()) / 1000)
           );
         });
@@ -260,12 +259,14 @@ export default {
         let diff_index = 0;
         for (let j = 0; j < aNodes.length; j++) {
           const nodeElement = aNodes[j];
-          const sMotif = nodeElement.slice(1, 8);
+          const l0 = nodeElement.indexOf("[") + 1;
+          const l1 = nodeElement.indexOf("]");
+          const sMotif = nodeElement.slice(l0, l1);
           const aNodeLabel = sMotif.split("-");
-          let fromNodeId = aNodeLabel[0].slice(0, 1);
-          const fromNodeLabel = aNodeLabel[0].slice(2, 3);
-          let toNodeId = aNodeLabel[1].slice(0, 1);
-          const toNodeLabel = aNodeLabel[1].slice(2, 3);
+          let fromNodeId = aNodeLabel[0].split(",")[0];
+          const fromNodeLabel = aNodeLabel[0].split(",")[1];
+          let toNodeId = aNodeLabel[1].split(",")[0];
+          const toNodeLabel = aNodeLabel[1].split(",")[1];
           const groupName = `Motif_${i}`;
           let addFromNode = false;
           let addToNode = false;

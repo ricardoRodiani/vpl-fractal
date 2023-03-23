@@ -98,7 +98,7 @@ export default {
       ctx.strokeStyle = "black";
       ctx.fillStyle = "black";
       let groups = Object.keys(this.network.options.groups);
-      const motifValue = this.uniqueMotifValue;
+      const motifValue = this.$props.unique_motif_value;
       this.network.nodes.map(
         function (node) {
           if (groups.includes(node.group)) {
