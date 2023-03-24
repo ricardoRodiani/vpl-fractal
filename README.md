@@ -39,7 +39,7 @@
 
 ```sh
 1. npm install
-2. change paths on ./server/routes/api/fractal.js to your user path/to/fractal
+2. change path on ./server/routes/api/fractal.js to your user path/to/fractal
 ```
 
 ## Usage
