@@ -15,7 +15,7 @@
 
 ## Requirements for running
 
-1. Follow [Fractal](https://github.com/dccspeed/fractal/tree/vd_visualprog_experimental) install instructions
+1. Follow [Fractal](https://github.com/dccspeed/fractal/tree/vd_visualprog_experimental) install instructions (use vd_visualprog_experimental branch)
 2. Follow [Apache Livy](https://livy.apache.org/get-started/) install instructions
 3. Insert the follow lines on Spark CONF file (cd /path/to/spark/conf)
 
