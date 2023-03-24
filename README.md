@@ -18,16 +18,28 @@
 1. Follow [Fractal](https://github.com/dccspeed/fractal/tree/vd_visualprog_experimental) install instructions
 2. Follow [Apache Livy](https://livy.apache.org/get-started/) install instructions
 3. Insert the follow lines on Spark CONF file (cd /path/to/spark/conf)
+
    > spark.jars.packages com.koloboke:koloboke-impl-jdk8:1.0.0,com.typesafe.akka:akka-remote_2.11:2.5.3
+
    > spark.master local[1]
+
    > spark.master.memory 2g
+
    > spark.driver.memory 2g
+
    > spark.worker.memory 2g
+
+4. Insert the follow lines and replace to your path on Livy CONF file (cd /path/to/apache-livy/conf/)
+
+   > livy.spark.scala-version = 2.11
+
+   > livy.file.local-dir-whitelist = /home/unix/libs_tcc/fractal/fractal-core/build/libs,/home/unix/libs_tcc/spark/jars
 
 ## Install
 
 ```sh
 1. npm install
+2. change paths on ./server/routes/api/fractal.js to your user path/to/fractal
 ```
 
 ## Usage
