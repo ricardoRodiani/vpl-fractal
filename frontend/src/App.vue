@@ -193,12 +193,12 @@ export default {
       // let match = this.code.match(".*fractoid.");
       // this.code = this.code.replace(/.*fractoid./g, "");
       // let temp_header = this.header + match[0];
-      if (this.execNum % 10 === 0) {
-        this.code = this.header + this.code;
-        this.code = this.code + this.footer;
-      } else {
-        this.code = `val motifs = fgraph.vfractoid.` + this.code + this.footer;
-      }
+      // if (this.execNum % 10 === 0) {
+      this.code = this.header + this.code;
+      this.code = this.code + this.footer;
+      // } else {
+      //   this.code = `val motifs = fgraph.vfractoid.` + this.code + this.footer;
+      // }
       axios
         .post("http://localhost:3080/fractal/runcode", {
           stmt: `${this.code}`,
