@@ -27,7 +27,8 @@
     "express-fileupload": "^1.4.0",
     "form-data": "^4.0.0",
     "livy-client": "^1.0.1",
-    "mongodb": "^4.7.0"
+    "mongodb": "^4.7.0",
+    "readme-md-generator": "^1.0.0"
   },
   "devDependencies": {
     "cookie-parser": "^1.4.6",
