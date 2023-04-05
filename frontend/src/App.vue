@@ -52,7 +52,7 @@
 import BlocklyJS from "blockly/javascript";
 import BlocklyComponent from "./components/BlocklyComponent.vue";
 import GraphComponentVue from "./components/GraphComponent.vue";
-import DarkTheme from "@blockly/theme-dark";
+// import DarkTheme from "@blockly/theme-dark";
 import axios from "axios";
 import "./blocks/fractal";
 
@@ -121,7 +121,7 @@ export default {
       code_dialog: false,
       graph_dialog: false,
       options: {
-        theme: DarkTheme,
+        // theme: DarkTheme,
         collapse: true,
         comments: false,
         disable: false,
@@ -260,7 +260,10 @@ export default {
         for (let j = 0; j < aNodes.length; j++) {
           const nodeElement = aNodes[j];
           const l0 = nodeElement.indexOf("[") + 1;
-          const l1 = nodeElement.indexOf("]");
+          const l1 =
+            nodeElement.indexOf("]") === -1
+              ? nodeElement.length
+              : nodeElement.indexOf("]");
           const sMotif = nodeElement.slice(l0, l1);
           const aNodeLabel = sMotif.split("-");
           let fromNodeId = aNodeLabel[0].split(",")[0];
